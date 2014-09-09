@@ -94,7 +94,7 @@ server.get('/deck/:id/size', function(req, res, next) {
 
 // Get a card by shorthand.
 server.get('/card/:id', function(req, res, next) {
-    var card = cards.CARDS[req.params.id];
+    var card = cards.cardFromShorthand(req.params.id);
     if (card) {
         res.send(200, card);
         next();
@@ -106,7 +106,7 @@ server.get('/card/:id', function(req, res, next) {
 
 // Get a card's rank.
 server.get('/card/:id/rank', function(req, res, next) {
-    var card = cards.CARDS[req.params.id];
+    var card = cards.cardFromShorthand(req.params.id);
     if (card) {
         res.send(200, card.rank);
         next();
@@ -118,7 +118,7 @@ server.get('/card/:id/rank', function(req, res, next) {
 
 // Get a card's ordinal rank (1-13).
 server.get('/card/:id/rank/ordinal', function(req, res, next) {
-    var ord = cards.CARD_RANK_ORDINALS[req.params.id];
+    var ord = cards.rankOrdinalFromCardShorthand(req.params.id);
     if (ord !== undefined) {
         res.send(200, ord);
         next();
@@ -131,7 +131,7 @@ server.get('/card/:id/rank/ordinal', function(req, res, next) {
 
 // Get a card's suit.
 server.get('/card/:id/suit', function(req, res, next) {
-    var card = cards.CARDS[req.params.id];
+    var card = cards.cardFromShorthand(req.params.id);
     if (card) {
         res.send(200, card.suit);
         next();
