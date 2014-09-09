@@ -1,3 +1,4 @@
+var _ = require('underscore');
 var restify = require('restify');
 var redis = require('redis');
 var Hashids = require('hashids'),
@@ -89,6 +90,38 @@ server.get('/deck/:id/size', function(req, res, next) {
         if (!err)
             res.send(200, reply);
         next();
+    });
+});
+
+// Draw one random card from a given deck.
+server.post('/deck/:id/draw', function(req, res, next) {
+    client.spop('deck:' + req.params.id, function(err, reply) {
+        if (!err) {
+            res.send(200, reply);
+        } else {
+            res.send(400);
+        }
+    });
+});
+
+// Draw some number of randomly selected cards from a given deck.
+server.post('/deck/:id/draw/:num', function(req, res, next) {
+    // Two options here based on available Redis set operations:
+    // (1) Pop (SPOP) one random card at a time.
+    // (2) Get N random cards at once (SRANDMEMBER), then remove them
+    //     all at once (SREM).
+    // I'd expect (1) is faster for N=1, maybe N=2-3ish, but (2) faster for large N.
+    // However, I'd expect most draws will often be of 1-5 cards.
+    var query = client.multi();
+    _(req.params.num).times(function() {
+        query.spop('deck:' + req.params.id);
+    });
+    query.exec(function(err, replies) {
+        if (!err) {
+            res.send(200, replies);
+        } else {
+            res.send(400);
+        }
     });
 });
 
