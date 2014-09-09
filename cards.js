@@ -1,31 +1,66 @@
 var _ = require('underscore');
 
-var RANK_SHORTHANDS = [
+function Rank(id) {
+    if (id in Rank.RANKS)
+        this.id = id;
+    else
+        return;
+};
+
+Rank.RANK_SHORTHANDS = [
     'A', '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K'
 ];
 
-var _RANKS = _.object(RANK_SHORTHANDS, [
+Rank.RANKS = _.object(Rank.RANK_SHORTHANDS, [
     'ace', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'jack', 'queen', 'king'
 ]);
 
-var rankFromShorthand = function(id) {
-    return _RANKS[id];
+Rank.RANK_ORDINALS = _.object(Rank.RANK_SHORTHANDS, Rank.RANK_SHORTHANDS.map(function(id, i) {
+    return i + 1;
+}));
+
+Rank.prototype.toString = function() {
+    return Rank.RANKS[this.id];
 };
 
-var SUIT_SHORTHANDS = [ 'C', 'D', 'H', 'S' ];
-
-var _SUITS = {
-    'C': 'clubs',
-    'D': 'diamonds',
-    'H': 'hearts',
-    'S': 'spades'
+Rank.prototype.valueOf = function() {
+    return Rank.RANK_ORDINALS[this.id];
 };
 
-var suitFromShorthand = function(id) {
-    return _SUITS[id];
+Rank.prototype.toJSON = function() {
+    return this.toString();
 };
 
-var SHORTHANDS = [
+function Suit(id) {
+    if (id in Suit.SUITS)
+        this.id = id;
+    else
+        return;
+};
+
+Suit.SUIT_SHORTHANDS = [ 'C', 'D', 'H', 'S' ];
+
+Suit.SUITS = _.object(Suit.SUIT_SHORTHANDS, [
+    'clubs', 'diamonds', 'hearts', 'spades'
+]);
+
+Suit.prototype.toString = function() {
+    return Suit.SUITS[this.id];
+};
+
+Suit.prototype.toJSON = function() {
+    return this.toString();
+};
+
+function Card(rank, suit) {
+    this.rank = new Rank(rank);
+    this.suit = new Suit(suit);
+
+    if (!this.rank || !this.suit)
+        return;
+};
+
+Card.SHORTHANDS = [
     'CA', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'CT', 'CJ', 'CQ',
     'CK', 'DA', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8', 'D9', 'DT', 'DJ',
     'DQ', 'DK', 'HA', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7', 'H8', 'H9', 'HT',
@@ -33,29 +68,10 @@ var SHORTHANDS = [
     'ST', 'SJ', 'SQ', 'SK'
 ];
 
-var _CARDS = _.object(SHORTHANDS, SHORTHANDS.map(function(id) {
-    return {
-        'rank': _RANKS[id.charAt(1)],
-        'suit': _SUITS[id.charAt(0)]
-    };
+Card.CARDS = _.object(Card.SHORTHANDS, Card.SHORTHANDS.map(function(id) {
+    return new Card(id.charAt(1), id.charAt(0));
 }));
 
-var cardFromShorthand = function(id) {
-    return _CARDS[id];
-};
-
-var _CARD_RANK_ORDINALS = _.object(SHORTHANDS, SHORTHANDS.map(function(id) {
-    return 1 + RANK_SHORTHANDS.indexOf(id.charAt(1));
-}));
-
-var rankOrdinalFromCardShorthand = function(id) {
-    return _CARD_RANK_ORDINALS[id];
-};
-
-exports.RANK_SHORTHANDS = RANK_SHORTHANDS;
-exports.rankFromShorthand = rankFromShorthand;
-exports.SUIT_SHORTHANDS = SUIT_SHORTHANDS;
-exports.suitFromShorthand = suitFromShorthand;
-exports.SHORTHANDS = SHORTHANDS;
-exports.cardFromShorthand = cardFromShorthand;
-exports.rankOrdinalFromCardShorthand = rankOrdinalFromCardShorthand;
+exports.Rank = Rank;
+exports.Suit = Suit;
+exports.Card = Card;

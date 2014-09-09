@@ -18,7 +18,7 @@ client.on('error', function(err) {
 // Create reference deck, if necessary.
 client.exists('deck:complete', function(err, reply) {
     if (!reply) {
-        client.sadd(['deck:complete'].concat(cards.SHORTHANDS),
+        client.sadd(['deck:complete'].concat(cards.Card.CARDS),
                     function(err, reply) {
                         console.log('Created reference deck.');
                     }
@@ -94,7 +94,7 @@ server.get('/deck/:id/size', function(req, res, next) {
 
 // Get a card by shorthand.
 server.get('/card/:id', function(req, res, next) {
-    var card = cards.cardFromShorthand(req.params.id);
+    var card = cards.Card.CARDS[req.params.id];
     if (card) {
         res.send(200, card);
         next();
@@ -106,7 +106,7 @@ server.get('/card/:id', function(req, res, next) {
 
 // Get a card's rank.
 server.get('/card/:id/rank', function(req, res, next) {
-    var card = cards.cardFromShorthand(req.params.id);
+    var card = cards.Card.CARDS[req.params.id];
     if (card) {
         res.send(200, card.rank);
         next();
@@ -118,9 +118,9 @@ server.get('/card/:id/rank', function(req, res, next) {
 
 // Get a card's ordinal rank (1-13).
 server.get('/card/:id/rank/ordinal', function(req, res, next) {
-    var ord = cards.rankOrdinalFromCardShorthand(req.params.id);
-    if (ord !== undefined) {
-        res.send(200, ord);
+    var card = cards.Card.CARDS[req.params.id];
+    if (card) {
+        res.send(200, Number(card.rank));
         next();
     } else {
         res.send(404);
@@ -131,7 +131,7 @@ server.get('/card/:id/rank/ordinal', function(req, res, next) {
 
 // Get a card's suit.
 server.get('/card/:id/suit', function(req, res, next) {
-    var card = cards.cardFromShorthand(req.params.id);
+    var card = cards.Card.CARDS[req.params.id];
     if (card) {
         res.send(200, card.suit);
         next();
