@@ -113,6 +113,13 @@ server.get('/decks', function(req, res, next) {
     });
 });
 
+// Dev only: delete all decks. (NOTE: This includes the reference deck.)
+server.del('/decks', function(req, res, next) {
+    client.flushall(function(err, reply) {
+        res.send(200, !err);
+        next();
+    });
+});
 
 server.listen(8080, function() {
   console.log('%s listening at %s', server.name, server.url);
