@@ -3,9 +3,7 @@ var redis = require('redis');
 var Hashids = require('hashids'),
     hashids = new Hashids('rest-cards dev salt', 6);
 
-var deck = require('./deck.js');
-
-var aDeck = new deck.Deck();
+var cards = require('./cards.js');
 
 // Set up REST server.
 var server = restify.createServer();
@@ -20,11 +18,7 @@ client.on('error', function(err) {
 // Create reference deck, if necessary.
 client.exists('deck:complete', function(err, reply) {
     if (!reply) {
-        client.sadd('deck:complete', 'CA', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8',
-                    'C9', 'C10', 'CJ', 'CQ', 'CK', 'DA', 'D2', 'D3', 'D4', 'D5', 'D6',
-                    'D7', 'D8', 'D9', 'D10', 'DJ', 'DQ', 'DK', 'HA', 'H2', 'H3', 'H4',
-                    'H5', 'H6', 'H7', 'H8', 'H9', 'H10', 'HJ', 'HQ', 'HK', 'SA', 'S2',
-                    'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9', 'S10', 'SJ', 'SQ', 'SK',
+        client.sadd(['deck:complete'].concat(cards.SHORTHANDS),
                     function(err, reply) {
                         console.log('Created reference deck.');
                     }
@@ -96,6 +90,18 @@ server.get('/deck/:id/size', function(req, res, next) {
             res.send(200, reply);
         next();
     });
+});
+
+// Get a card by shorthand.
+server.get('/card/:id', function(req, res, next) {
+    var card = cards.CARDS[req.params.id];
+    if (card) {
+        res.send(200, card);
+        next();
+    } else {
+        res.send(404);
+        next();
+    }
 });
 
 // Dev only: get all deck ids.
