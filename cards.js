@@ -7,21 +7,12 @@ var SHORTHANDS = [
     'HJ', 'HQ', 'HK', 'SA', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9',
     'ST', 'SJ', 'SQ', 'SK'
 ];
-var RANKS = {
-    'A': 'ace',
-    '2': 'two',
-    '3': 'three',
-    '4': 'four',
-    '5': 'five',
-    '6': 'six',
-    '7': 'seven',
-    '8': 'eight',
-    '9': 'nine',
-    'T': 'ten',
-    'J': 'jack',
-    'Q': 'queen',
-    'K': 'king'
-};
+var RANK_SHORTHANDS = [
+    'A', '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K'
+];
+var RANKS = _.object(RANK_SHORTHANDS, [
+    'ace', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'jack', 'queen', 'king'
+]);
 var SUITS = {
     'C': 'clubs',
     'D': 'diamonds',
@@ -34,8 +25,13 @@ var CARDS = _.object(SHORTHANDS, SHORTHANDS.map(function(id) {
         'suit': SUITS[id.charAt(0)]
     };
 }));
+var CARD_RANK_ORDINALS = _.object(SHORTHANDS, SHORTHANDS.map(function(id) {
+    return 1 + RANK_SHORTHANDS.indexOf(id.charAt(1));
+}));
 
 exports.SHORTHANDS = SHORTHANDS;
+exports.RANK_SHORTHANDS = RANK_SHORTHANDS;
 exports.RANKS = RANKS;
 exports.SUITS = SUITS;
 exports.CARDS = CARDS;
+exports.CARD_RANK_ORDINALS = CARD_RANK_ORDINALS;

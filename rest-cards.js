@@ -104,6 +104,43 @@ server.get('/card/:id', function(req, res, next) {
     }
 });
 
+// Get a card's rank.
+server.get('/card/:id/rank', function(req, res, next) {
+    var card = cards.CARDS[req.params.id];
+    if (card) {
+        res.send(200, card.rank);
+        next();
+    } else {
+        res.send(404);
+        next();
+    }
+});
+
+// Get a card's ordinal rank (1-13).
+server.get('/card/:id/rank/ordinal', function(req, res, next) {
+    var ord = cards.CARD_RANK_ORDINALS[req.params.id];
+    if (ord !== undefined) {
+        res.send(200, ord);
+        next();
+    } else {
+        res.send(404);
+        next();
+    }
+});
+
+
+// Get a card's suit.
+server.get('/card/:id/suit', function(req, res, next) {
+    var card = cards.CARDS[req.params.id];
+    if (card) {
+        res.send(200, card.suit);
+        next();
+    } else {
+        res.send(404);
+        next();
+    }
+});
+
 // Dev only: get all deck ids.
 server.get('/decks', function(req, res, next) {
     client.sunion('named-decks', 'hashed-decks', function(err, reply) {
