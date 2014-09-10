@@ -17,32 +17,37 @@ client.on('error', function(err) {
 });
 
 // Create reference deck, if necessary.
-client.exists('deck:complete', function(err, reply) {
+client.exists('ref-deck', function(err, reply) {
     if (!reply) {
-        client.sadd(['deck:complete'].concat(cards.Card.CARDS),
+        client.sadd(['ref-deck'].concat(cards.Card.SHORTHANDS),
                     function(err, reply) {
-                        console.log('Created reference deck.');
+                        if (!err)
+                            console.log('Created reference deck.');
                     }
         );
     }
 });
 
-// Create new deck with the given id.
+// Create new deck with the given id.  If such a deck exists, overwrite it.
 server.put('/deck/:id', function(req, res, next) {
-    // What's the RESTful thing to do when PUTing to an existing resource?
     var id = 'deck:' + req.params.id;
-    client.sunionstore(id, 'deck:complete', function(err) {
+    client.sunionstore(id, 'ref-deck', function(err) {
         if (!err) {
             client.multi()
             .smembers(id)
             .sadd('named-decks', id)
             .exec(function(err, replies) {
-                // err?
-                res.send(200, replies[0]);
+                if (!err) {
+                    res.send(201, replies[0]);
+                } else {
+                    res.send(400);
+                }
                 next();
             });
-        } else
+        } else {
+            res.send(400);
             next();
+        }
     });
 });
 
@@ -55,15 +60,22 @@ server.post('/deck', function(req, res, next) {
             id = 'deck:' + hash;
         // Copy the reference deck into this one.
         // TODO: Factor some of this out to avoid redundancy with PUT /deck/:id?
-        client.sunionstore(id, 'deck:complete', function(err) {
+        client.sunionstore(id, 'ref-deck', function(err) {
             if (!err) {
                 client.sadd('hashed-decks', id, function(err) {
-                    if (!err)
-                        res.send(200, req.path() + '/' + hash);
+                    if (!err) {
+                        res.header('Location', req.path() + '/' + hash);
+                        res.send(201);
+                    } else {
+                        // TODO: Combine these queries as one transaction.
+                        res.send(400);
+                    }
                     next();
                 });
-            } else
+            } else {
+                res.send(400);
                 next();
+            }
         });
     });
 });
@@ -73,8 +85,11 @@ server.get('/deck/:id', function(req, res, next) {
     client.exists('deck:' + req.params.id, function(err, exists) {
         if (!err && exists) {
             client.smembers('deck:' + req.params.id, function(err, reply) {
-                if (!err)
+                if (!err) {
                     res.send(200, reply);
+                } else {
+                    res.send(404);
+                }
                 next();
             });
         } else {
@@ -87,8 +102,11 @@ server.get('/deck/:id', function(req, res, next) {
 // Get the number of cards in a deck.
 server.get('/deck/:id/size', function(req, res, next) {
     client.scard('deck:' + req.params.id, function(err, reply) {
-        if (!err)
+        if (!err) {
             res.send(200, reply);
+        } else {
+            res.send(404);
+        }
         next();
     });
 });
@@ -101,6 +119,7 @@ server.post('/deck/:id/draw', function(req, res, next) {
         } else {
             res.send(400);
         }
+        next();
     });
 });
 
@@ -122,6 +141,7 @@ server.post('/deck/:id/draw/:num', function(req, res, next) {
         } else {
             res.send(400);
         }
+        next();
     });
 });
 
@@ -130,11 +150,10 @@ server.get('/card/:id', function(req, res, next) {
     var card = cards.Card.CARDS[req.params.id];
     if (card) {
         res.send(200, card);
-        next();
     } else {
         res.send(404);
-        next();
     }
+    next();
 });
 
 // Get a card's rank.
@@ -142,11 +161,10 @@ server.get('/card/:id/rank', function(req, res, next) {
     var card = cards.Card.CARDS[req.params.id];
     if (card) {
         res.send(200, card.rank);
-        next();
     } else {
         res.send(404);
-        next();
     }
+    next();
 });
 
 // Get a card's ordinal rank (1-13).
@@ -154,11 +172,10 @@ server.get('/card/:id/rank/ordinal', function(req, res, next) {
     var card = cards.Card.CARDS[req.params.id];
     if (card) {
         res.send(200, Number(card.rank));
-        next();
     } else {
         res.send(404);
-        next();
     }
+    next();
 });
 
 
@@ -167,18 +184,20 @@ server.get('/card/:id/suit', function(req, res, next) {
     var card = cards.Card.CARDS[req.params.id];
     if (card) {
         res.send(200, card.suit);
-        next();
     } else {
         res.send(404);
-        next();
     }
+    next();
 });
 
 // Dev only: get all deck ids.
 server.get('/decks', function(req, res, next) {
     client.sunion('named-decks', 'hashed-decks', function(err, reply) {
-        if (!err)
+        if (!err) {
             res.send(200, reply);
+        } else {
+            res.send(404);
+        }
         next();
     });
 });
@@ -186,7 +205,7 @@ server.get('/decks', function(req, res, next) {
 // Dev only: delete all decks. (NOTE: This includes the reference deck.)
 server.del('/decks', function(req, res, next) {
     client.flushall(function(err, reply) {
-        res.send(200, !err);
+        res.send(!err ? 200 : 404);
         next();
     });
 });
