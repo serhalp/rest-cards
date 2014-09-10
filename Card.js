@@ -4,11 +4,11 @@ var Rank = require('./Rank.js');
 var Suit = require('./Suit.js');
 
 function Card(rank, suit) {
-    this.rank = new Rank(rank);
-    this.suit = new Suit(suit);
-
-    if (!this.rank || !this.suit)
+    if (!(rank instanceof Rank && suit instanceof Suit))
         return;
+
+    this.rank = rank;
+    this.suit = suit;
 };
 
 Card.SHORTHANDS = [
@@ -20,7 +20,7 @@ Card.SHORTHANDS = [
 ];
 
 Card.CARDS = _.object(Card.SHORTHANDS, Card.SHORTHANDS.map(function(id) {
-    return new Card(id.charAt(1), id.charAt(0));
+    return new Card(new Rank(id.charAt(1)), new Suit(id.charAt(0)));
 }));
 
 module.exports = Card;
