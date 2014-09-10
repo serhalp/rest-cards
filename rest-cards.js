@@ -31,52 +31,45 @@ client.exists('ref-deck', function(err, reply) {
 // Create new deck with the given id.  If such a deck exists, overwrite it.
 server.put('/deck/:id', function(req, res, next) {
     var id = 'deck:' + req.params.id;
-    client.sunionstore(id, 'ref-deck', function(err) {
-        if (!err) {
-            client.multi()
-            .smembers(id)
-            .sadd('named-decks', id)
-            .exec(function(err, replies) {
-                if (!err) {
-                    res.send(201, replies[0]);
-                } else {
-                    res.send(400);
-                }
-                next();
-            });
-        } else {
-            res.send(400);
+    client.multi()
+        // Copy the reference deck into this one.
+        .sunionstore(id, 'ref-deck')
+        .smembers(id)
+        .sadd('named-decks', id)
+        .exec(function(err, replies) {
+            if (!err) {
+                res.send(201, replies[1]);
+            } else {
+                res.send(400);
+            }
             next();
-        }
-    });
+        });
 });
 
 // Create new deck and return its id.
 server.post('/deck', function(req, res, next) {
     // Get the current number of hashed deck IDs, and use that to generate the next one.
-    // TODO: How do we handle concurrency here?
-    client.scard('hashed-decks', function(err, n) {
-        var hash = hashids.encrypt(n),
-            id = 'deck:' + hash;
-        // Copy the reference deck into this one.
-        // TODO: Factor some of this out to avoid redundancy with PUT /deck/:id?
-        client.sunionstore(id, 'ref-deck', function(err) {
-            if (!err) {
-                client.sadd('hashed-decks', id, function(err) {
+    client.incr('size:hashed-decks', function(err, n) {
+        if (!err) {
+            var hash = hashids.encrypt(n),
+                id = 'deck:' + hash;
+            // Copy the reference deck into this one.
+            client.multi()
+                .sunionstore(id, 'ref-deck')
+                .sadd('hashed-decks', id)
+                .exec(function(err, replies) {
                     if (!err) {
                         res.header('Location', req.path() + '/' + hash);
                         res.send(201);
                     } else {
-                        // TODO: Combine these queries as one transaction.
                         res.send(400);
                     }
                     next();
                 });
-            } else {
-                res.send(400);
-                next();
-            }
-        });
+        } else {
+            res.send(400);
+            next();
+        }
     });
 });
 
