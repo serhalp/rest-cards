@@ -4,7 +4,7 @@ var redis = require('redis');
 var Hashids = require('hashids'),
     hashids = new Hashids('rest-cards dev salt', 6);
 
-var cards = require('./cards.js');
+var Card = require('./Card.js');
 
 // Set up REST server.
 var server = restify.createServer();
@@ -19,7 +19,7 @@ client.on('error', function(err) {
 // Create reference deck, if necessary.
 client.exists('ref-deck', function(err, reply) {
     if (!reply) {
-        client.sadd(['ref-deck'].concat(cards.Card.SHORTHANDS),
+        client.sadd(['ref-deck'].concat(Card.SHORTHANDS),
                     function(err, reply) {
                         if (!err)
                             console.log('Created reference deck.');
@@ -147,7 +147,7 @@ server.post('/deck/:id/draw/:num', function(req, res, next) {
 
 // Get a card by shorthand.
 server.get('/card/:id', function(req, res, next) {
-    var card = cards.Card.CARDS[req.params.id];
+    var card = Card.CARDS[req.params.id];
     if (card) {
         res.send(200, card);
     } else {
@@ -158,7 +158,7 @@ server.get('/card/:id', function(req, res, next) {
 
 // Get a card's rank.
 server.get('/card/:id/rank', function(req, res, next) {
-    var card = cards.Card.CARDS[req.params.id];
+    var card = Card.CARDS[req.params.id];
     if (card) {
         res.send(200, card.rank);
     } else {
@@ -169,7 +169,7 @@ server.get('/card/:id/rank', function(req, res, next) {
 
 // Get a card's ordinal rank (1-13).
 server.get('/card/:id/rank/ordinal', function(req, res, next) {
-    var card = cards.Card.CARDS[req.params.id];
+    var card = Card.CARDS[req.params.id];
     if (card) {
         res.send(200, Number(card.rank));
     } else {
@@ -181,7 +181,7 @@ server.get('/card/:id/rank/ordinal', function(req, res, next) {
 
 // Get a card's suit.
 server.get('/card/:id/suit', function(req, res, next) {
-    var card = cards.Card.CARDS[req.params.id];
+    var card = Card.CARDS[req.params.id];
     if (card) {
         res.send(200, card.suit);
     } else {
