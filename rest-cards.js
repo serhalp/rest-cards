@@ -35,7 +35,7 @@ server.put('/deck/:id', function(req, res, next) {
         // Copy the reference deck into this one.
         .sunionstore(id, 'ref-deck')
         .smembers(id)
-        .sadd('named-decks', id)
+        .sadd('decks', id)
         .exec(function(err, replies) {
             if (!err) {
                 res.send(201, replies[1]);
@@ -49,14 +49,14 @@ server.put('/deck/:id', function(req, res, next) {
 // Create new deck and return its id.
 server.post('/deck', function(req, res, next) {
     // Get the current number of hashed deck IDs, and use that to generate the next one.
-    client.incr('size:hashed-decks', function(err, n) {
+    client.incr('hash-counter', function(err, n) {
         if (!err) {
             var hash = hashids.encrypt(n),
                 id = 'deck:' + hash;
             // Copy the reference deck into this one.
             client.multi()
                 .sunionstore(id, 'ref-deck')
-                .sadd('hashed-decks', id)
+                .sadd('decks', id)
                 .exec(function(err, replies) {
                     if (!err) {
                         res.header('Location', req.path() + '/' + hash);
@@ -94,25 +94,41 @@ server.get('/deck/:id', function(req, res, next) {
 
 // Get the number of cards in a deck.
 server.get('/deck/:id/size', function(req, res, next) {
-    client.scard('deck:' + req.params.id, function(err, reply) {
-        if (!err) {
-            res.send(200, reply);
+    var id = 'deck:' + req.params.id;
+    client.sismember('decks', id, function(err, reply) {
+        if (!err && reply) {
+            client.scard(id, function(err, reply) {
+                if (!err && reply) {
+                    res.send(200, reply);
+                } else {
+                    res.send(400);
+                }
+                next();
+            });
         } else {
             res.send(404);
+            next();
         }
-        next();
     });
 });
 
 // Draw one random card from a given deck.
 server.post('/deck/:id/draw', function(req, res, next) {
-    client.spop('deck:' + req.params.id, function(err, reply) {
-        if (!err) {
-            res.send(200, reply);
+    var id = 'deck:' + req.params.id;
+    client.sismember('decks', id, function(err, reply) {
+        if (!err && reply) {
+            client.spop(id, function(err, reply) {
+                if (!err && reply) {
+                    res.send(200, reply);
+                } else {
+                    res.send(400);
+                }
+                next();
+            });
         } else {
-            res.send(400);
+            res.send(404);
+            next();
         }
-        next();
     });
 });
 
@@ -124,17 +140,26 @@ server.post('/deck/:id/draw/:num', function(req, res, next) {
     //     all at once (SREM).
     // I'd expect (1) is faster for N=1, maybe N=2-3ish, but (2) faster for large N.
     // However, I'd expect most draws will often be of 1-5 cards.
-    var query = client.multi();
-    _(req.params.num).times(function() {
-        query.spop('deck:' + req.params.id);
-    });
-    query.exec(function(err, replies) {
-        if (!err) {
-            res.send(200, replies);
+    var id = 'deck:' + req.params.id;
+    client.sismember('decks', id, function(err, reply) {
+        if (!err && reply) {
+            var query = client.multi();
+            _(req.params.num).times(function() {
+                query.spop(id);
+            });
+            query.exec(function(err, replies) {
+                var drawn = replies.filter(_.negate(_.isNull));
+                if (!err && !_.isEmpty(drawn)) {
+                    res.send(200, drawn);
+                } else {
+                    res.send(400);
+                }
+                next();
+            });
         } else {
-            res.send(400);
+            res.send(404);
+            next();
         }
-        next();
     });
 });
 
@@ -185,7 +210,7 @@ server.get('/card/:id/suit', function(req, res, next) {
 
 // Dev only: get all deck ids.
 server.get('/decks', function(req, res, next) {
-    client.sunion('named-decks', 'hashed-decks', function(err, reply) {
+    client.smembers('decks', function(err, reply) {
         if (!err) {
             res.send(200, reply);
         } else {
