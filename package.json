@@ -30,6 +30,6 @@
   "main": "lib/rest-cards.js",
   "scripts": {
     "test": "jasmine-node --forceexit spec/",
-    "start": "redis-server /usr/local/etc/redis.conf && node lib/rest-cards.js"
+    "start": "node lib/rest-cards.js"
   }
 }
