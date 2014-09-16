@@ -5,10 +5,14 @@ var Suit = require('./Suit.js');
 
 function Card(rank, suit) {
     if (!(rank instanceof Rank && suit instanceof Suit))
-        return;
+        throw new Error('Invalid rank and/or suit');
 
     this.rank = rank;
     this.suit = suit;
+
+    this.toString = function() {
+        return String(this.rank) + ' of ' + String(this.suit);
+    };
 };
 
 Card.SHORTHANDS = [

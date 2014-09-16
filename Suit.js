@@ -1,24 +1,24 @@
 var _ = require('underscore');
 
 function Suit(id) {
-    if (id in Suit.SUITS)
+    var SHORTHANDS = [ 'C', 'D', 'H', 'S' ];
+
+    var SUITS = _.object(SHORTHANDS, [
+        'clubs', 'diamonds', 'hearts', 'spades'
+    ]);
+
+    if (id in SUITS)
         this.id = id;
     else
-        return;
-};
+        throw new Error('Invalid suit shorthand');
 
-Suit.SUIT_SHORTHANDS = [ 'C', 'D', 'H', 'S' ];
+    this.toString = function() {
+        return SUITS[this.id];
+    };
 
-Suit.SUITS = _.object(Suit.SUIT_SHORTHANDS, [
-    'clubs', 'diamonds', 'hearts', 'spades'
-]);
-
-Suit.prototype.toString = function() {
-    return Suit.SUITS[this.id];
-};
-
-Suit.prototype.toJSON = function() {
-    return this.toString();
+    this.toJSON = function() {
+        return this.toString();
+    };
 };
 
 module.exports = Suit;
