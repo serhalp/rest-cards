@@ -1,6 +1,6 @@
-var Rank = require('../Rank.js');
-var Suit = require('../Suit.js');
-var Card = require('../Card.js');
+var Rank = require('../lib/Rank.js');
+var Suit = require('../lib/Suit.js');
+var Card = require('../lib/Card.js');
 
 describe('Card', function() {
     var card;

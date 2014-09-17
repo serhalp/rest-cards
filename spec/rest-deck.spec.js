@@ -76,7 +76,7 @@ describe('rest-cards /deck/', function() {
                 expect(err).toBeNull();
                 expect(res.statusCode).toBe(200);
                 expect(obj).toEqual(jasmine.any(String));
-                expect(obj.length).toEqual(2);
+                expect(obj.length).toEqual(8); // e.g. '/card/D3'
                 done();
             });
         });
@@ -98,7 +98,7 @@ describe('rest-cards /deck/', function() {
                 expect(obj.length).toEqual(3);
                 obj.forEach(function(card) {
                     expect(card).toEqual(jasmine.any(String));
-                    expect(card.length).toEqual(2);
+                    expect(card.length).toEqual(8); // e.g. '/card/D3'
                 });
                 done();
             });

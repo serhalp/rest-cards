@@ -1,4 +1,4 @@
-var Suit = require('../Suit.js');
+var Suit = require('../lib/Suit.js');
 
 describe('Suit class', function() {
     it('creates clubs', function() {

@@ -1,4 +1,4 @@
-var Rank = require('../Rank.js');
+var Rank = require('../lib/Rank.js');
 
 describe('Rank', function() {
     it('creates an ace', function() {
