@@ -1,10 +1,26 @@
 var restify = require('restify');
 
-describe('rest-cards /card/', function() {
-    var client = restify.createJsonClient({
-        'url': 'http://localhost:8080'
-    });
+var client = restify.createJsonClient({
+    'url': 'http://localhost:8080'
+});
 
+describe('rest-cards /cards', function() {
+    it('gets the full collection of valid cards', function(done) {
+        client.get('/cards', function(err, req, res, obj) {
+            expect(err).toBeNull();
+            expect(res.statusCode).toBe(200);
+            expect(obj).toEqual(jasmine.any(Array));
+            expect(obj.length).toEqual(52);
+            obj.forEach(function(card) {
+                expect(card).toEqual(jasmine.any(String));
+                expect(card.length).toEqual(8); // e.g. '/card/D3'
+            });
+            done();
+        });
+    });
+});
+
+describe('rest-cards /card/', function() {
     it('gets a card by shorthand', function(done) {
         client.get('/card/D3', function(err, req, res, obj) {
             expect(err).toBeNull();
