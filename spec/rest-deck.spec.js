@@ -14,7 +14,10 @@ describe('rest-cards /deck/', function() {
                 expect(res.statusCode).toBe(201);
                 expect(obj).toEqual(jasmine.any(Array));
                 expect(obj.length).toEqual(52);
-                // TODO: Check response body.
+                obj.forEach(function(card) {
+                    expect(card).toEqual(jasmine.any(String));
+                    expect(card.length).toEqual(8); // e.g. '/card/D3'
+                });
                 decks.push('/deck/testdeck');
                 done();
             });
@@ -39,7 +42,10 @@ describe('rest-cards /deck/', function() {
                     expect(res.statusCode).toBe(200);
                     expect(obj).toEqual(jasmine.any(Array));
                     expect(obj.length).toEqual(52);
-                    // TODO: Check response body.
+                    obj.forEach(function(card) {
+                        expect(card).toEqual(jasmine.any(String));
+                        expect(card.length).toEqual(8); // e.g. '/card/D3'
+                    });
                     done();
                 });
             });
