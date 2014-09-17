@@ -1,0 +1,139 @@
+FORMAT: 1A
+HOST: http://rest-cards.herokuapp.com
+
+# rest-cards
+A RESTful playing card API.
+
+# Group Deck
+Deck-related resources
+
+## Deck [/deck]
+### Create a deck [POST]
++ Response 201 (application/json)
+
+    + Header
+
+            Location: /deck/newdeckid
+
++ Response 400 (application/json)
+
+### A deck [/deck/{id}]
+
++ Parameters
+    + id (required, string, `somedeckid`) ... Unique identifier of the deck.
+
+#### Create a named deck [PUT]
++ Response 201 (application/json)
+
+    + Body
+
+            [ "/card/D3", "/card/QH", "/card/9D", ... ]
+
++ Response 400 (application/json)
+
+#### Get an existing deck [GET]
++ Response 200 (application/json)
+
+    + Body
+
+            [ "/card/D3", "/card/QH", "/card/9D", ... ]
+
++ Response 404 (application/json)
+
+#### Deck size [/deck/{id}/size]
+
++ Parameters
+    + id (required, string, `somedeckid`) ... Unique identifier of the deck.
+
+##### Get a deck's size [GET]
++ Response 200 (application/json)
+
+    + Body
+
+            52
+
++ Response 404 (application/json)
++ Response 400 (application/json)
+
+#### Draw from a deck [/deck/{id}/draw]
+
+##### Draw a single card from a deck [POST]
++ Response 201 (application/json)
+
+    + Body
+
+            "/card/D3"
+
++ Response 404 (application/json)
++ Response 400 (application/json)
+
+##### Draw multiple from a deck [/deck/{id}/draw/{number}]
+
++ Parameters
+    + id (required, string, `somedeckid`) ... Unique identifier of the deck.
+    + number (required, number, `3`) ... Number of cards to draw, at most.
+
+###### Draw a number of cards from a deck [POST]
+If there are fewer than `number` cards remaining in the deck, but at least one, these are returned.  If no cards remain in the deck, a 400 status code is returned.
+
++ Response 201 (application/json)
+
+    + Body
+
+            [ "/card/D3", "/card/QH", "/card/9D", ... ]
+
++ Response 404 (application/json)
++ Response 400 (application/json)
+
+# Group Card
+Card-related resources
+
+## Card [/card/{id}]
+
++ Parameters
+    + id (required, string, `D3`) ... Unique identifier of the card.
+
+### Get an existing card [GET]
++ Response 200 (application/json)
+
+    + Body
+
+            { "rank": "three", "suit": "diamonds" }
+
++ Response 404 (application/json)
+
+### Card rank [/card/{id}/rank]
+
+#### Get a card's rank [GET]
++ Response 200 (application/json)
+
+    + Body
+
+            "three"
+
++ Response 404 (application/json)
+
+#### Card ordinal rank [/card/{id}/rank/ordinal]
+
+##### Get a card's ordinal rank [GET]
++ Response 200 (application/json)
+
+    + Body
+
+            3
+
++ Response 404 (application/json)
+
+### Card suit [/card/{id}/suit]
+
+#### Get a card's suit [GET]
++ Response 200 (application/json)
+
+    + Body
+
+            "diamonds"
+
++ Response 404 (application/json)
+
+
+
