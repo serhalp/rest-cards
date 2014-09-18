@@ -147,4 +147,24 @@ describe('rest-cards /deck/', function() {
             });
         });
     });
+
+    describe('deletion', function() {
+        it('deletes an existing deck', function(done) {
+            client.del('/deck/testdeck', function(err, req, res, obj) {
+                expect(err).toBeNull();
+                expect(res.statusCode).toBe(204);
+                expect(obj).toEqual({});
+                done();
+            });
+        });
+
+        it('returns 404 on invalid resource', function(done) {
+            client.del('/deck/fakedeck', function(err, req, res, obj) {
+                expect(err).not.toBeNull();
+                expect(res.statusCode).toBe(404);
+                expect(obj).toEqual({});
+                done();
+            });
+        });
+    });
 });
