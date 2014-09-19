@@ -1,7 +1,7 @@
 var restify = require('restify');
 
 var client = restify.createJsonClient({
-    'url': 'http://localhost:8080'
+    'url': 'http://localhost:' + (process.env.PORT || 8080)
 });
 
 describe('rest-cards /cards', function() {
