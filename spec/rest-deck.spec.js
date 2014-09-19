@@ -23,6 +23,20 @@ describe('rest-cards /deck/', function() {
             });
         });
 
+        it('overwrites an existing deck', function(done) {
+            client.put('/deck/testdeck', function(err, req, res, obj) {
+                expect(err).toBeNull();
+                expect(res.statusCode).toBe(200);
+                expect(obj).toEqual(jasmine.any(Array));
+                expect(obj.length).toEqual(52);
+                obj.forEach(function(card) {
+                    expect(card).toEqual(jasmine.any(String));
+                    expect(card.length).toEqual(8); // e.g. '/card/D3'
+                });
+                done();
+            });
+        });
+
         it('creates and names a new deck', function(done) {
             client.post('/deck', function(err, req, res, obj) {
                 expect(err).toBeNull();

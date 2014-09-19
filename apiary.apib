@@ -22,13 +22,14 @@ Deck-related resources
 + Parameters
     + id (required, string, `somedeckid`) ... Unique identifier of the deck.
 
-#### Create a named deck [PUT]
+#### Create or overwrite a named deck [PUT]
 + Response 201 (application/json)
 
     + Body
 
             [ "/card/D3", "/card/QH", "/card/9D", ... ]
 
++ Response 200 (application/json)
 + Response 400 (application/json)
 
 #### Get an existing deck [GET]
