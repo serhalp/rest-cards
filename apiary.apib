@@ -8,9 +8,12 @@ A RESTful playing card API.
 Deck-related resources
 
 ## Deck [/deck]
-### Create a deck [POST]
-+ Response 201 (application/json)
++ Request Create a complete deck (application/json)
++ Request Create a partial deck (application/json)
+    + Body
 
+            [ "/card/D3", "/card/QH", "/card/9D" ]
++ Response 201 (application/json)
     + Header
 
             Location: /deck/newdeckid
@@ -23,11 +26,19 @@ Deck-related resources
     + id (required, string, `somedeckid`) ... Unique identifier of the deck.
 
 #### Create or overwrite a named deck [PUT]
++ Request Create a complete deck (application/json)
 + Response 201 (application/json)
-
     + Body
 
             [ "/card/D3", "/card/QH", "/card/9D", ... ]
++ Request Create a partial deck (application/json)
+    + Body
+
+            [ "/card/D3", "/card/QH", "/card/9D" ]
++ Response 201 (application/json)
+    + Body
+
+            [ "/card/D3", "/card/QH", "/card/9D" ]
 
 + Response 200 (application/json)
 + Response 400 (application/json)
