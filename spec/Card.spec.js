@@ -22,6 +22,11 @@ describe('Card', function() {
         expect(JSON.stringify(card)).toBe(JSON.stringify({ 'rank': 'three', 'suit': 'diamonds' }));
     });
 
+    it('has a valid image representation', function(done) {
+        expect(card.image).toBeDefined();
+        done();
+    });
+
     var invalid = [
         [undefined, undefined],
         [null, null],

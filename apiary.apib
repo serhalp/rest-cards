@@ -128,6 +128,17 @@ Card-related resources
 
 + Response 404 (application/json)
 
++ Request (image/*)
+
++ Response 200 (image/svg+xml)
+
+    + Body
+
+            <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+            <svg>...</svg>
+
++ Response 404 (image/svg+xml)
+
 ### Card rank [/card/{id}/rank]
 
 #### Get a card's rank [GET]

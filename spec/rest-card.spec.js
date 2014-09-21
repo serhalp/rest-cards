@@ -1,12 +1,14 @@
 var restify = require('restify');
 
-var client = restify.createJsonClient({
+var jsonClient = restify.createJsonClient({
+    'url': 'http://localhost:' + (process.env.PORT || 8080)
+}), stringClient = restify.createStringClient({
     'url': 'http://localhost:' + (process.env.PORT || 8080)
 });
 
 describe('rest-cards /cards', function() {
     it('gets the full collection of valid cards', function(done) {
-        client.get('/cards', function(err, req, res, obj) {
+        jsonClient.get('/cards', function(err, req, res, obj) {
             expect(err).toBeNull();
             expect(res.statusCode).toBe(200);
             expect(obj).toEqual(jasmine.any(Array));
@@ -22,7 +24,7 @@ describe('rest-cards /cards', function() {
 
 describe('rest-cards /card/', function() {
     it('gets a card by shorthand', function(done) {
-        client.get('/card/D3', function(err, req, res, obj) {
+        jsonClient.get('/card/D3', function(err, req, res, obj) {
             expect(err).toBeNull();
             expect(obj.rank).toBeDefined();
             expect(obj.rank).toEqual('three');
@@ -32,8 +34,20 @@ describe('rest-cards /card/', function() {
         });
     });
 
+    it('gets a card image by shorthand', function(done) {
+        stringClient.get({ 'path': '/card/D3', 'headers': { 'accept': 'image/*' } },
+                         function(err, req, res, obj) {
+            expect(err).toBeNull();
+            expect(res.statusCode).toBe(200);
+            expect(obj).toEqual(jasmine.any(String));
+            expect(obj).toMatch(/<?xml/);
+            expect(obj).toMatch(/<svg/);
+            done();
+        });
+    });
+
     it('gets a card\'s suit', function(done) {
-        client.get('/card/D3/suit', function(err, req, res, obj) {
+        jsonClient.get('/card/D3/suit', function(err, req, res, obj) {
             expect(err).toBeNull();
             expect(obj).toBe('diamonds');
             done();
@@ -41,7 +55,7 @@ describe('rest-cards /card/', function() {
     });
 
     it('gets a card\'s rank', function(done) {
-        client.get('/card/D3/rank', function(err, req, res, obj) {
+        jsonClient.get('/card/D3/rank', function(err, req, res, obj) {
             expect(err).toBeNull();
             expect(obj).toBe('three');
             done();
@@ -49,7 +63,7 @@ describe('rest-cards /card/', function() {
     });
 
     it('gets a card\'s ordinal rank', function(done) {
-        client.get('/card/D3/rank/ordinal', function(err, req, res, obj) {
+        jsonClient.get('/card/D3/rank/ordinal', function(err, req, res, obj) {
             expect(err).toBeNull();
             expect(obj).toEqual(3);
             done();
@@ -68,12 +82,22 @@ describe('rest-cards /card/', function() {
     ];
     should404.forEach(function(path) {
         it('returns 404 on invalid resource /card/' + path, function(done) {
-            client.get('/card/' + path, function(err, req, res, obj) {
+            jsonClient.get('/card/' + path, function(err, req, res, obj) {
                 expect(err).not.toBeNull();
                 expect(obj).toEqual({});
                 expect(res.statusCode).toBe(404);
                 done();
             });
+        });
+    });
+
+    it('returns 404 on requesting image for invalid resource /card/C0', function(done) {
+        stringClient.get({ 'path': '/card/C0', 'headers': { 'accept': 'image/*' } },
+                         function(err, req, res, obj) {
+            expect(err).not.toBeNull();
+            expect(obj).toEqual('');
+            expect(res.statusCode).toBe(404);
+            done();
         });
     });
 });
