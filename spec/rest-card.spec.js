@@ -26,6 +26,7 @@ describe('rest-cards /card/', function() {
     it('gets a card by shorthand', function(done) {
         jsonClient.get('/card/D3', function(err, req, res, obj) {
             expect(err).toBeNull();
+            expect(res.statusCode).toBe(200);
             expect(obj.rank).toBeDefined();
             expect(obj.rank).toEqual('three');
             expect(obj.suit).toBeDefined();
@@ -49,6 +50,7 @@ describe('rest-cards /card/', function() {
     it('gets a card\'s suit', function(done) {
         jsonClient.get('/card/D3/suit', function(err, req, res, obj) {
             expect(err).toBeNull();
+            expect(res.statusCode).toBe(200);
             expect(obj).toBe('diamonds');
             done();
         });
@@ -57,6 +59,7 @@ describe('rest-cards /card/', function() {
     it('gets a card\'s rank', function(done) {
         jsonClient.get('/card/D3/rank', function(err, req, res, obj) {
             expect(err).toBeNull();
+            expect(res.statusCode).toBe(200);
             expect(obj).toBe('three');
             done();
         });
@@ -65,6 +68,7 @@ describe('rest-cards /card/', function() {
     it('gets a card\'s ordinal rank', function(done) {
         jsonClient.get('/card/D3/rank/ordinal', function(err, req, res, obj) {
             expect(err).toBeNull();
+            expect(res.statusCode).toBe(200);
             expect(obj).toEqual(3);
             done();
         });
