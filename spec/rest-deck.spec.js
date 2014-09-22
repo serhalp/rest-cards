@@ -12,6 +12,7 @@ describe('rest-cards /deck/', function() {
             client.put('/deck/testdeck', function(err, req, res, obj) {
                 expect(err).toBeNull();
                 expect(res.statusCode).toBe(201);
+                expect(res.headers['content-type']).toEqual('application/json');
                 expect(obj).toEqual(jasmine.any(Array));
                 expect(obj.length).toEqual(52);
                 obj.forEach(function(card) {
@@ -27,6 +28,7 @@ describe('rest-cards /deck/', function() {
             client.put('/deck/testdeck', function(err, req, res, obj) {
                 expect(err).toBeNull();
                 expect(res.statusCode).toBe(200);
+                expect(res.headers['content-type']).toEqual('application/json');
                 expect(obj).toEqual(jasmine.any(Array));
                 expect(obj.length).toEqual(52);
                 obj.forEach(function(card) {
@@ -53,6 +55,7 @@ describe('rest-cards /deck/', function() {
                        function(err, req, res, obj) {
                 expect(err).toBeNull();
                 expect(res.statusCode).toBe(201);
+                expect(res.headers['content-type']).toEqual('application/json');
                 expect(obj).toEqual(jasmine.any(Array));
                 console.log(obj.length);
                 expect(obj.length).toEqual(3);
@@ -71,6 +74,7 @@ describe('rest-cards /deck/', function() {
                        function(err, req, res, obj) {
                 expect(err).toBeNull();
                 expect(res.statusCode).toBe(200);
+                expect(res.headers['content-type']).toEqual('application/json');
                 expect(obj).toEqual(jasmine.any(Array));
                 expect(obj.length).toEqual(2);
                 obj.forEach(function(card) {
@@ -100,6 +104,7 @@ describe('rest-cards /deck/', function() {
                 client.get(path, function(err, req, res, obj) {
                     expect(err).toBeNull();
                     expect(res.statusCode).toBe(200);
+                    expect(res.headers['content-type']).toEqual('application/json');
                     expect(obj).toEqual(jasmine.any(Array));
                     expect(obj.length).toEqual(decks[path]);
                     obj.forEach(function(card) {
@@ -114,6 +119,7 @@ describe('rest-cards /deck/', function() {
                 client.get(path + '/size', function(err, req, res, obj) {
                     expect(err).toBeNull();
                     expect(res.statusCode).toBe(200);
+                    expect(res.headers['content-type']).toEqual('application/json');
                     expect(obj).toEqual(decks[path]);
                     done();
                 });
@@ -141,6 +147,7 @@ describe('rest-cards /deck/', function() {
             client.post('/deck/testdeck/draw', function(err, req, res, obj) {
                 expect(err).toBeNull();
                 expect(res.statusCode).toBe(200);
+                expect(res.headers['content-type']).toEqual('application/json');
                 expect(obj).toEqual(jasmine.any(String));
                 expect(obj.length).toEqual(8); // e.g. '/card/D3'
                 done();
@@ -151,6 +158,7 @@ describe('rest-cards /deck/', function() {
             client.get('/deck/testdeck/size', function(err, req, res, obj) {
                 expect(err).toBeNull();
                 expect(res.statusCode).toBe(200);
+                expect(res.headers['content-type']).toEqual('application/json');
                 expect(obj).toEqual(51);
                 done();
             });
@@ -160,6 +168,7 @@ describe('rest-cards /deck/', function() {
             client.post('/deck/testdeck/draw/3', function(err, req, res, obj) {
                 expect(err).toBeNull();
                 expect(res.statusCode).toBe(200);
+                expect(res.headers['content-type']).toEqual('application/json');
                 expect(obj).toEqual(jasmine.any(Array));
                 expect(obj.length).toEqual(3);
                 obj.forEach(function(card) {
@@ -174,6 +183,7 @@ describe('rest-cards /deck/', function() {
             client.get('/deck/testdeck/size', function(err, req, res, obj) {
                 expect(err).toBeNull();
                 expect(res.statusCode).toBe(200);
+                expect(res.headers['content-type']).toEqual('application/json');
                 expect(obj).toEqual(48);
                 done();
             });
@@ -183,6 +193,7 @@ describe('rest-cards /deck/', function() {
             client.post('/deck/testdeck/draw/49', function(err, req, res, obj) {
                 expect(err).toBeNull();
                 expect(res.statusCode).toBe(200);
+                expect(res.headers['content-type']).toEqual('application/json');
                 expect(obj).toEqual(jasmine.any(Array));
                 expect(obj.length).toEqual(48);
                 done();

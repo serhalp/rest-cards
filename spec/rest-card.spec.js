@@ -11,6 +11,7 @@ describe('rest-cards /cards', function() {
         jsonClient.get('/cards', function(err, req, res, obj) {
             expect(err).toBeNull();
             expect(res.statusCode).toBe(200);
+            expect(res.headers['content-type']).toEqual('application/json');
             expect(obj).toEqual(jasmine.any(Array));
             expect(obj.length).toEqual(52);
             obj.forEach(function(card) {
@@ -27,6 +28,7 @@ describe('rest-cards /card/', function() {
         jsonClient.get('/card/D3', function(err, req, res, obj) {
             expect(err).toBeNull();
             expect(res.statusCode).toBe(200);
+            expect(res.headers['content-type']).toEqual('application/json');
             expect(obj.rank).toBeDefined();
             expect(obj.rank).toEqual('three');
             expect(obj.suit).toBeDefined();
@@ -40,6 +42,7 @@ describe('rest-cards /card/', function() {
                          function(err, req, res, obj) {
             expect(err).toBeNull();
             expect(res.statusCode).toBe(200);
+            expect(res.headers['content-type']).toEqual('image/svg+xml');
             expect(obj).toEqual(jasmine.any(String));
             expect(obj).toMatch(/<?xml/);
             expect(obj).toMatch(/<svg/);
@@ -51,6 +54,7 @@ describe('rest-cards /card/', function() {
         jsonClient.get('/card/D3/suit', function(err, req, res, obj) {
             expect(err).toBeNull();
             expect(res.statusCode).toBe(200);
+            expect(res.headers['content-type']).toEqual('application/json');
             expect(obj).toBe('diamonds');
             done();
         });
@@ -60,6 +64,7 @@ describe('rest-cards /card/', function() {
         jsonClient.get('/card/D3/rank', function(err, req, res, obj) {
             expect(err).toBeNull();
             expect(res.statusCode).toBe(200);
+            expect(res.headers['content-type']).toEqual('application/json');
             expect(obj).toBe('three');
             done();
         });
@@ -69,6 +74,7 @@ describe('rest-cards /card/', function() {
         jsonClient.get('/card/D3/rank/ordinal', function(err, req, res, obj) {
             expect(err).toBeNull();
             expect(res.statusCode).toBe(200);
+            expect(res.headers['content-type']).toEqual('application/json');
             expect(obj).toEqual(3);
             done();
         });
